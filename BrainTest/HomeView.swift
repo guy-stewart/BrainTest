@@ -183,7 +183,7 @@ struct ReactionTimeView: View {
                 
                 if !viewModel.gameStarted {
                     VStack(spacing: 30) {
-                        Text("Test your speed. Click the button when the circle turns red")
+                        Text("Test your speed. Click the circle when it turns red")
                             .font(.system(size: 18))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
@@ -249,21 +249,15 @@ struct ReactionTimeView: View {
                                 }
                             }
                             
-                            Circle()
-                                .fill(viewModel.isRed ? Color.red : Color.gray)
-                                .frame(width: 150, height: 150)
-                                .shadow(color: viewModel.isRed ? .red.opacity(0.5) : .clear, radius: 20)
-                            
                             Button(action: {
                                 viewModel.handleClick()
                             }) {
-                                Text("\(viewModel.clickCount)")
-                                    .font(.system(size: 48, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 200, height: 80)
-                                    .background(Color.white.opacity(0.3))
-                                    .cornerRadius(15)
+                                Circle()
+                                    .fill(viewModel.isRed ? Color.red : Color.gray)
+                                    .frame(width: 150, height: 150)
+                                    .shadow(color: viewModel.isRed ? .red.opacity(0.5) : .clear, radius: 20)
                             }
+                            .disabled(!viewModel.isRed)
                         }
                     }
                 }
@@ -648,8 +642,8 @@ class MovingDotViewModel: ObservableObject {
         
         let angle = CGFloat.random(in: 0...(2 * .pi))
         dotVelocity = CGPoint(
-            x: CGFloat(cos(Double(angle))) * initialSpeed,
-            y: CGFloat(sin(Double(angle))) * initialSpeed
+            x: _math.cos(angle) * initialSpeed,
+            y: _math.sin(angle) * initialSpeed
         )
         
         startTime = Date()
@@ -773,9 +767,6 @@ class ReactionTimeViewModel: ObservableObject {
             } else {
                 scheduleRedCircle()
             }
-        } else {
-            timer?.invalidate()
-            scheduleRedCircle()
         }
     }
     

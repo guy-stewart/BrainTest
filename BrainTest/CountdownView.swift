@@ -157,17 +157,3 @@ struct CountdownView_Previews: PreviewProvider {
     }
 }
 
-/*
- Name the nine planets,Mercury,Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,Pluto
-
- Name the 10 largest cities in the US,New York City, Los Angeles, Chicago, Houston, Phoenix, San Antonio, Philadelphia, San Diego, Dallas, Fort Worth
- Name the 7 dwarves,Doc,Grumpy,Happy,Sleepy,Bashful,Sneezy,Dopey
- Name the 13 original American colonies,New Hampshire,Massachusetts,Rhode Island,Connecticut,New York,New Jersey,Pennsylvania,Delaware,Maryland,Virginia,North Carolina,South Carolina,Georgia
- Name the 12 months of the year,January,February,March,April,May,June,July,August,September,October,November,December
- Name the 7 continents of the world,Asia,Africa,North America,South America,Antarctica,Europe,Australia
- Name the 5 Great Lakes,Superior,Michigan,Huron,Erie,Ontario
- Name the 4 seasons,spring,summer,fall,winter
- Name the 5 oceans,Pacific Ocean,Atlantic Ocean,Indian Ocean,Southern Ocean,Arctic Ocean
- Name the 7 colors of the rainbow,red,orange,yellow,green,blue,indigo,violet
-
- */

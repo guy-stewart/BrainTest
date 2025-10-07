@@ -132,7 +132,7 @@ class TriviaViewModel: ObservableObject {
             // Observe transcript changes
             self.speechRecognizer.$transcript
                 .sink { [weak self] transcript in
-                    print("Transcript received: \(transcript)") // Debugging log
+                    // print("Transcript received: \(transcript)") // Debugging log
                     self?.processTranscript(transcript)
                 }
                 .store(in: &self.cancellables)
@@ -144,13 +144,13 @@ class TriviaViewModel: ObservableObject {
         
         // Process only non-empty transcripts
         guard !transcript.isEmpty else {
-            print("Empty transcript received") // Debugging log
+            // print("Empty transcript received") // Debugging log
             return
         }
         
         // Split transcript into words
         let spokenWords = transcript.lowercased().components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
-        print("Spoken words: \(spokenWords)") // Debugging log
+        // print("Spoken words: \(spokenWords)") // Debugging log
         
         // Check the last one or two words for a match
         let lastOneWord = spokenWords.last ?? ""
@@ -158,7 +158,7 @@ class TriviaViewModel: ObservableObject {
         
         // First try two-word answers, then single-word answers
         if !lastTwoWords.isEmpty && validAnswers.contains(lastTwoWords) && !recognizedAnswers.contains(lastTwoWords) {
-            print("Recognized two-word answer: \(lastTwoWords)") // Debugging log
+            // print("Recognized two-word answer: \(lastTwoWords)") // Debugging log
             DispatchQueue.main.async {
                 self.recognizedAnswers.append(lastTwoWords)
                 if self.recognizedAnswers.count == self.validAnswers.count {
@@ -171,10 +171,10 @@ class TriviaViewModel: ObservableObject {
             // Clear transcript to prevent re-processing
             DispatchQueue.main.async {
                 self.speechRecognizer.transcript = ""
-                print("Transcript cleared") // Debugging log
+                // print("Transcript cleared") // Debugging log
             }
         } else if !lastOneWord.isEmpty && validAnswers.contains(lastOneWord) && !recognizedAnswers.contains(lastOneWord) {
-            print("Recognized single-word answer: \(lastOneWord)") // Debugging log
+            // print("Recognized single-word answer: \(lastOneWord)") // Debugging log
             DispatchQueue.main.async {
                 self.recognizedAnswers.append(lastOneWord)
                 if self.recognizedAnswers.count == self.validAnswers.count {
@@ -187,11 +187,11 @@ class TriviaViewModel: ObservableObject {
             // Clear transcript to prevent re-processing
             DispatchQueue.main.async {
                 self.speechRecognizer.transcript = ""
-                print("Transcript cleared") // Debugging log
+                //print("Transcript cleared") // Debugging log
             }
-        } else {
+        } /* else {
             print("No match for last words: \(lastTwoWords.isEmpty ? lastOneWord : lastTwoWords)") // Debugging log
-        }
+        }*/
     }
 }
 
