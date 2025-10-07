@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict/>
+	</array>
+    <key>NSMicrophoneUsageDescription</key>
+       <string>We need microphone access to listen to the words you say.</string>
+       <key>NSSpeechRecognitionUsageDescription</key>
+       <string>We need speech recognition to identify the words you speak.</string>
+</dict>
+</plist>

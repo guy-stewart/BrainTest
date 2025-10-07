@@ -1,0 +1,109 @@
+# -----------------------------
+# Xcode & macOS
+# -----------------------------
+.DS_Store
+*.swp
+*.lock
+*.xcuserstate
+*.xcscmblueprint
+xcuserdata/
+*.moved-aside
+*.xcworkspace/xcuserdata/
+
+# -----------------------------
+# Build products
+# -----------------------------
+build/
+DerivedData/
+*.o
+*.LinkFileList
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# -----------------------------
+# Swift Package Manager
+# -----------------------------
+.swiftpm/
+.build/
+Package.resolved
+
+# -----------------------------
+# CocoaPods
+# -----------------------------
+Pods/
+# If using CocoaPods with workspaces, uncomment:
+# Podfile.lock
+
+# -----------------------------
+# Carthage
+# -----------------------------
+Carthage/Build/
+
+# -----------------------------
+# Fastlane
+# -----------------------------
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# -----------------------------
+# User settings & logs
+# -----------------------------
+*.xcuserdatad
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+*.xcworkspace/contents.xcworkspacedata
+*.log
+
+# -----------------------------
+# Swift Playgrounds
+# -----------------------------
+timeline.xctimeline
+playground.xcworkspace
+
+# -----------------------------
+# Simulator files
+# -----------------------------
+*.simdevicetype
+*.simruntime
+
+# -----------------------------
+# Generated docs / artifacts
+# -----------------------------
+docset/
+*.doccarchive
+*.tmp
+*.orig
+
+# -----------------------------
+# SwiftLint / Xcode warnings
+# -----------------------------
+.swiftlint.yml
+*.xcresult
+
+# -----------------------------
+# Environment & secrets
+# -----------------------------
+*.env
+*.key
+*.pem
+*.p12
+*.mobileprovision
+
+# -----------------------------
+# Optional: exclude project-level previews and cache
+# -----------------------------
+*.xcpreviews/
+.previews/
+
+# -----------------------------
+# Optional: custom tools / scripts
+# -----------------------------
+Tools/*
+Scripts/*.log
+
