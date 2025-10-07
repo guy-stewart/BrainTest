@@ -16,7 +16,7 @@ struct CountdownView: View {
                 }) {
                     HStack {
                         Image(systemName: "house.fill")
-                        Text("Home")
+                        // Text("Home")
                     }
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
@@ -25,7 +25,18 @@ struct CountdownView: View {
                     .background(Color.white.opacity(0.3))
                     .cornerRadius(15)
                 }
+                
                 Spacer()
+                
+                NavigationLink(destination: CountdownGraphView()) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 24))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.white.opacity(0.3))
+                        .cornerRadius(15)
+                }
             }
             .padding(.horizontal)
             
@@ -112,7 +123,6 @@ class CountdownViewModel: ObservableObject {
             // Observe transcript changes
             self.speechRecognizer.$transcript
                 .sink { [weak self] transcript in
-                    // print("Transcript received: \(transcript)") // Debugging log
                     self?.processTranscript(transcript)
                 }
                 .store(in: &self.cancellables)
@@ -123,18 +133,13 @@ class CountdownViewModel: ObservableObject {
         guard !isChallengeComplete else { return }
         
         // Process only non-empty transcripts
-        guard !transcript.isEmpty else {
-            // print("Empty transcript received") // Debugging log
-            return
-        }
+        guard !transcript.isEmpty else { return }
         
         // Extract the last two characters of the transcript
         let lastTwoChars = String(transcript.suffix(2))
-        // print("Processing last two characters: \(lastTwoChars)") // Debugging log
         
         // Check if the last two characters form a valid number matching the expected number
         if let spokenNumber = Int(lastTwoChars), spokenNumber == expectedNumbers[correctCount] {
-            // print("Recognized number: \(spokenNumber)") // Debugging log
             correctCount += 1
             DispatchQueue.main.async {
                 self.currentNumber = spokenNumber
@@ -143,10 +148,40 @@ class CountdownViewModel: ObservableObject {
                     self.isChallengeComplete = true
                     self.timer?.invalidate()
                     self.speechRecognizer.stop()
+                    self.saveToCSV()
                 }
             }
-        } else {
-            // print("No match for last two characters: \(lastTwoChars), expected: \(self.expectedNumbers[correctCount])") // Debugging log
+        }
+    }
+    
+    private func saveToCSV() {
+        let fileManager = FileManager.default
+        let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("stats.csv")
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let timestamp = dateFormatter.string(from: Date())
+        let score = String(format: "%.1f", elapsedTime)
+        let csvLine = "\(timestamp),Countdown,,\(score)\n"
+        
+        do {
+            if !fileManager.fileExists(atPath: fileURL.path) {
+                // Create file with header if it doesn't exist
+                let header = "Timestamp,Test,,Score\n"
+                try header.write(to: fileURL, atomically: true, encoding: .utf8)
+            }
+            
+            // Append the new score
+            if let fileHandle = try? FileHandle(forWritingTo: fileURL) {
+                defer { fileHandle.closeFile() }
+                fileHandle.seekToEndOfFile()
+                if let data = csvLine.data(using: .utf8) {
+                    fileHandle.write(data)
+                }
+            }
+        } catch {
+            print("Error writing to CSV: \(error)")
         }
     }
 }
@@ -156,4 +191,3 @@ struct CountdownView_Previews: PreviewProvider {
         CountdownView()
     }
 }
-

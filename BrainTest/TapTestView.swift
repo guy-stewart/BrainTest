@@ -19,7 +19,7 @@ struct TapTestView: View {
                 }) {
                     HStack {
                         Image(systemName: "house.fill")
-                        Text("Home")
+                        // Text("Home")
                     }
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
@@ -28,7 +28,18 @@ struct TapTestView: View {
                     .background(Color.white.opacity(0.3))
                     .cornerRadius(15)
                 }
+                
                 Spacer()
+                
+                NavigationLink(destination: TapGraphView()) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 24))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.white.opacity(0.3))
+                        .cornerRadius(15)
+                }
             }
             .padding(.horizontal)
             
@@ -99,9 +110,10 @@ struct TapTestView: View {
         isTimerRunning = false
         isButtonDisabled = true
         buttonLabel = "Play Again"
+        saveToCSV()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            isButtonDisabled = false
+            self.isButtonDisabled = false
         }
     }
     
@@ -111,5 +123,43 @@ struct TapTestView: View {
         isTimerRunning = false
         buttonLabel = "Tap Me"
         isButtonDisabled = false
+    }
+    
+    private func saveToCSV() {
+        let fileManager = FileManager.default
+        let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("stats.csv")
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let timestamp = dateFormatter.string(from: Date())
+        let score = String(tapCount)
+        let csvLine = "\(timestamp),Tap,,\(score)\n"
+        
+        do {
+            if !fileManager.fileExists(atPath: fileURL.path) {
+                // Create file with header if it doesn't exist
+                let header = "Timestamp,Test,,Score\n"
+                try header.write(to: fileURL, atomically: true, encoding: .utf8)
+            }
+            
+            // Append the new score
+            if let fileHandle = try? FileHandle(forWritingTo: fileURL) {
+                defer { fileHandle.closeFile() }
+                fileHandle.seekToEndOfFile()
+                if let data = csvLine.data(using: .utf8) {
+                    fileHandle.write(data)
+                }
+            }
+        } catch {
+            print("Error writing to CSV: \(error)")
+        }
+    }
+}
+
+// MARK: - Preview
+struct TapTestView_Previews: PreviewProvider {
+    static var previews: some View {
+        TapTestView()
     }
 }

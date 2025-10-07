@@ -16,7 +16,7 @@ struct TriviaView: View {
                 }) {
                     HStack {
                         Image(systemName: "house.fill")
-                        Text("Home")
+                        // Text("Home")
                     }
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
