@@ -4,6 +4,8 @@ import Charts
 // MARK: - Word Challenge Graph View
 struct WordChallengeGraphView: View {
     @State private var data: [(date: Date, score: Int)] = []
+    @State private var selectedLetter: String = "All"
+    @State private var availableLetters: [String] = []
     @Environment(\.dismiss) private var dismiss
     
     var minScore: Int {
@@ -23,7 +25,7 @@ struct WordChallengeGraphView: View {
             )
             .ignoresSafeArea()
             
-            VStack(spacing: 20) {
+            VStack(spacing: 10) {
                 HStack {
                     Button(action: {
                         dismiss()
@@ -39,16 +41,32 @@ struct WordChallengeGraphView: View {
                         .background(Color.white.opacity(0.3))
                         .cornerRadius(15)
                     }
+                    
                     Spacer()
+                    
+                    Picker("Select Letter", selection: $selectedLetter) {
+                        Text("All").tag("All")
+                        ForEach(availableLetters, id: \.self) { letter in
+                            Text(letter).tag(letter)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .font(.system(size: 16))
+                    .padding(.horizontal)
+                    .background(Color.white.opacity(0.3))
+                    .cornerRadius(10)
+                    .disabled(availableLetters.isEmpty && data.isEmpty)
                 }
                 .padding(.horizontal)
+                .padding(.top)
                 
-                Text("Letter Challenge History")
+                Text("Letter History")
                     .font(.system(size: 36, weight: .bold))
                     .foregroundColor(.white)
+                    .padding(.bottom, 10)
                 
                 if data.isEmpty {
-                    Text("No data available yet")
+                    Text(selectedLetter == "All" ? "No data available" : "No data available for letter \(selectedLetter)")
                         .font(.system(size: 18))
                         .foregroundColor(.white.opacity(0.8))
                         .padding()
@@ -85,15 +103,20 @@ struct WordChallengeGraphView: View {
                         }
                     }
                     .foregroundStyle(.white)
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.bottom, 20) // Move X-axis labels downward
+                    .frame(maxHeight: .infinity) // Expand graph vertically
                 }
                 
                 Spacer()
             }
-            .padding()
+            .padding(.top)
         }
         .navigationBarHidden(true)
         .onAppear {
+            loadData()
+        }
+        .onChange(of: selectedLetter) { _ in
             loadData()
         }
     }
@@ -111,20 +134,33 @@ struct WordChallengeGraphView: View {
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
             
             var tempData: [(Date, Int)] = []
+            var lettersSet = Set<String>()
             
             for line in lines.dropFirst() { // Skip header
                 let parts = line.components(separatedBy: ",")
                 if parts.count >= 4 && parts[1].trimmingCharacters(in: .whitespaces) == "Letter" {
-                    if let date = dateFormatter.date(from: parts[0]),
-                       let score = Int(parts[3]) {
-                        tempData.append((date, score))
+                    let letter = parts[2].trimmingCharacters(in: .whitespaces)
+                    if !letter.isEmpty {
+                        lettersSet.insert(letter)
+                    }
+                    if selectedLetter == "All" || letter == selectedLetter {
+                        if let date = dateFormatter.date(from: parts[0]),
+                           let score = Int(parts[3]) {
+                            tempData.append((date, score))
+                        }
                     }
                 }
             }
             
+            availableLetters = lettersSet.sorted()
+            if selectedLetter != "All" && !availableLetters.contains(selectedLetter) && !availableLetters.isEmpty {
+                selectedLetter = availableLetters.first!
+            }
             data = tempData.sorted { $0.0 < $1.0 }
         } catch {
             print("Error loading stats.csv: \(error)")
+            availableLetters = []
+            data = []
         }
     }
 }
@@ -133,6 +169,6 @@ struct WordChallengeGraphView: View {
 struct WordChallengeGraphView_Previews: PreviewProvider {
     static var previews: some View {
         WordChallengeGraphView()
+            .previewInterfaceOrientation(.landscapeLeft)
     }
 }
-

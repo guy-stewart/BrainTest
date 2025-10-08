@@ -1,16 +1,18 @@
 import SwiftUI
 import Charts
 
-// MARK: - Countdown Graph View
-struct CountdownGraphView: View {
-    @State private var data: [(date: Date, score: Double)] = []
+// MARK: - Trivia Graph View
+struct TriviaGraphView: View {
+    @State private var data: [(date: Date, score: Int)] = []
+    @State private var selectedCategory: String = "9 planets"
+    @State private var availableCategories: [String] = []
     @Environment(\.dismiss) private var dismiss
     
-    var minScore: Double {
+    var minScore: Int {
         data.map { $0.score }.min() ?? 0
     }
     
-    var maxScore: Double {
+    var maxScore: Int {
         data.map { $0.score }.max() ?? 1
     }
     
@@ -23,7 +25,7 @@ struct CountdownGraphView: View {
             )
             .ignoresSafeArea()
             
-            VStack(spacing: 20) {
+            VStack(spacing: 10) {
                 HStack {
                     Button(action: {
                         dismiss()
@@ -39,16 +41,32 @@ struct CountdownGraphView: View {
                         .background(Color.white.opacity(0.3))
                         .cornerRadius(15)
                     }
+                    
                     Spacer()
+                    
+                    Picker("Select Category", selection: $selectedCategory) {
+                        // Text("All").tag("All")
+                        ForEach(availableCategories, id: \.self) { category in
+                            Text(category).tag(category)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .font(.system(size: 16))
+                    .padding(.horizontal)
+                    .background(Color.white.opacity(0.3))
+                    .cornerRadius(10)
+                    .disabled(availableCategories.isEmpty && data.isEmpty)
                 }
                 .padding(.horizontal)
+                .padding(.top)
                 
-                Text("Countdown History")
+                Text("Trivia History")
                     .font(.system(size: 36, weight: .bold))
                     .foregroundColor(.white)
+                    .padding(.bottom, 10)
                 
                 if data.isEmpty {
-                    Text("No data available yet")
+                    Text(selectedCategory == "All" ? "No data available" : "No data available for category \(selectedCategory)")
                         .font(.system(size: 18))
                         .foregroundColor(.white.opacity(0.8))
                         .padding()
@@ -57,12 +75,12 @@ struct CountdownGraphView: View {
                         ForEach(data.indices, id: \.self) { index in
                             LineMark(
                                 x: .value("Time", data[index].date),
-                                y: .value("Time (s)", data[index].score)
+                                y: .value("Answers", data[index].score)
                             )
                             .foregroundStyle(.yellow)
                         }
                     }
-                    .chartYScale(domain: (minScore * 0.9)...(maxScore * 1.1))
+                    .chartYScale(domain: (minScore - 1)...(maxScore + 1))
                     .chartXAxis {
                         AxisMarks { value in
                             AxisValueLabel(centered: false, anchor: .top) {
@@ -85,15 +103,20 @@ struct CountdownGraphView: View {
                         }
                     }
                     .foregroundStyle(.white)
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.bottom, 20) // Move X-axis labels downward
+                    .frame(maxHeight: .infinity) // Expand graph vertically
                 }
                 
                 Spacer()
             }
-            .padding()
+            .padding(.top)
         }
         .navigationBarHidden(true)
         .onAppear {
+            loadData()
+        }
+        .onChange(of: selectedCategory) { _ in
             loadData()
         }
     }
@@ -110,29 +133,42 @@ struct CountdownGraphView: View {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
             
-            var tempData: [(Date, Double)] = []
+            var tempData: [(Date, Int)] = []
+            var categoriesSet = Set<String>()
             
             for line in lines.dropFirst() { // Skip header
                 let parts = line.components(separatedBy: ",")
-                if parts.count >= 4 && parts[1].trimmingCharacters(in: .whitespaces) == "Countdown" {
-                    if let date = dateFormatter.date(from: parts[0]),
-                       let score = Double(parts[3]) {
-                        tempData.append((date, score))
+                if parts.count >= 4 && parts[1].trimmingCharacters(in: .whitespaces) == "Trivia" {
+                    let category = parts[2].trimmingCharacters(in: .whitespaces)
+                    if !category.isEmpty {
+                        categoriesSet.insert(category)
+                    }
+                    if selectedCategory == "All" || category == selectedCategory {
+                        if let date = dateFormatter.date(from: parts[0]),
+                           let score = Int(parts[3]) {
+                            tempData.append((date, score))
+                        }
                     }
                 }
             }
             
+            availableCategories = categoriesSet.sorted()
+            if selectedCategory != "All" && !availableCategories.contains(selectedCategory) && !availableCategories.isEmpty {
+                selectedCategory = availableCategories.first!
+            }
             data = tempData.sorted { $0.0 < $1.0 }
         } catch {
             print("Error loading stats.csv: \(error)")
+            availableCategories = []
+            data = []
         }
     }
 }
 
 // MARK: - Preview
-struct CountdownGraphView_Previews: PreviewProvider {
+struct TriviaGraphView_Previews: PreviewProvider {
     static var previews: some View {
-        CountdownGraphView()
+        TriviaGraphView()
+            .previewInterfaceOrientation(.landscapeLeft)
     }
 }
-

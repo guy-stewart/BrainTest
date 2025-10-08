@@ -377,12 +377,12 @@ class GameViewModel: NSObject, ObservableObject {
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let timestamp = dateFormatter.string(from: Date())
         let score = String(matchingWords.count)
-        let csvLine = "\(timestamp),Letter,,\(score)\n"
+        let csvLine = "\(timestamp),Letter,\(targetLetter),\(score)\n"
         
         do {
             if !fileManager.fileExists(atPath: fileURL.path) {
                 // Create file with header if it doesn't exist
-                let header = "Timestamp,Test,,Score\n"
+                let header = "Timestamp,Test,Letter,Score\n"
                 try header.write(to: fileURL, atomically: true, encoding: .utf8)
             }
             
