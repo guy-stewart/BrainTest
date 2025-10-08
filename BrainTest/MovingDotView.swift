@@ -113,7 +113,7 @@ struct MovingDotView: View {
                 if viewModel.gameStarted && !viewModel.gameEnded {
                     Circle()
                         .fill(Color.black)
-                        .frame(width: 10, height: 10)
+                        .frame(width: viewModel.dotDiameter, height: viewModel.dotDiameter)
                         .position(viewModel.dotPosition)
                         .onTapGesture {
                             viewModel.dotTapped()
@@ -135,14 +135,17 @@ class MovingDotViewModel: ObservableObject {
     @Published var dotPosition = CGPoint.zero
     @Published var elapsedTime: Double = 0
     @Published var finalTime: Double = 0
+    @Published var dotDiameter: CGFloat = 6.0 // Initial diameter
     
     var screenSize = CGSize.zero
     private var dotVelocity = CGPoint.zero
     private var gameTimer: Timer?
     private var animationTimer: Timer?
     private var startTime: Date?
-    private let gameDuration: Double = 60.0
+    private let gameDuration: Double = 30.0
     private let initialSpeed: Double = 400.0
+    private let initialDiameter: CGFloat = 8.0
+    private let finalDiameter: CGFloat = 35.0
     
     func startGame(screenSize: CGSize) {
         self.screenSize = screenSize
@@ -150,6 +153,7 @@ class MovingDotViewModel: ObservableObject {
         gameEnded = false
         elapsedTime = 0
         finalTime = 0
+        dotDiameter = initialDiameter
         
         dotPosition = CGPoint(
             x: CGFloat.random(in: 50...(screenSize.width - 50)),
@@ -168,6 +172,7 @@ class MovingDotViewModel: ObservableObject {
             guard let self = self, let startTime = self.startTime else { return }
             DispatchQueue.main.async {
                 self.elapsedTime = Date().timeIntervalSince(startTime)
+                self.dotDiameter = self.initialDiameter + (self.finalDiameter - self.initialDiameter) * CGFloat(self.elapsedTime / self.gameDuration)
             }
         }
         
@@ -185,6 +190,7 @@ class MovingDotViewModel: ObservableObject {
         finalTime = 0
         dotPosition = .zero
         dotVelocity = .zero
+        dotDiameter = initialDiameter
         startTime = nil
     }
     
@@ -206,7 +212,7 @@ class MovingDotViewModel: ObservableObject {
         var newX = dotPosition.x + (dotVelocity.x * speedMultiplier * deltaTime)
         var newY = dotPosition.y + (dotVelocity.y * speedMultiplier * deltaTime)
         
-        let dotRadius: CGFloat = 5
+        let dotRadius: CGFloat = dotDiameter / 2.0
         
         if newX <= dotRadius {
             newX = dotRadius
